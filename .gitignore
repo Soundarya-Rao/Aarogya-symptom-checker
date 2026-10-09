@@ -1,0 +1,60 @@
+# Environment variables and API keys (CRITICAL: NEVER COMMIT KEYS)
+.env
+.env.local
+.env.*
+!.env.example
+
+# Streamlit local configuration and secrets
+.streamlit/secrets.toml
+.streamlit/*.local.toml
+
+# SQLite consultation database & persistent storage
+consultations.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Logs and runtime outputs
+*.log
+logs/
+
+# Local scratch files, debug dumps, and temporary test images
+scratch/
+*.tmp
+*.png
+*.jpg
+*.jpeg
+
+# Preserve curated documentation screenshots
+!screenshots/
+!screenshots/*.png
+!screenshots/*.jpg
+!screenshots/*.jpeg
+
+# Operating system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
