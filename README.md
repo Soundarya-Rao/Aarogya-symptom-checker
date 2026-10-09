@@ -15,7 +15,7 @@ Built as an applied portfolio piece demonstrating **production-grade Generative 
 
 [![Watch the Aarogya demo video](./screenshots/1.png)](https://youtu.be/U7POrSfDLHE)
 
-[▶ Watch the demo on YouTube](https://youtu.be/U7POrSfDLHE)
+[▶ Watch the demo on YouTube](https://youtu.be/oBPMl9tbALY)
 
 *A walkthrough of a RED emergency case, a YELLOW case and a non-English case.*
 
