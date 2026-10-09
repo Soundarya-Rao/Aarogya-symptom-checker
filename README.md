@@ -11,6 +11,11 @@ An AI-driven public health triage system designed for multilingual healthcare ac
 
 Built as an applied portfolio piece demonstrating **production-grade Generative AI engineering, asymmetric risk evaluation, defensive API design, and telemetry logging** for Data Scientist, ML Engineer, and GenAI Engineer roles.
 
+## 🎥 Demo (1 min)
+
+[![Watch the Aarogya demo video](./screenshots/1.png)](https://youtu.be/U7POrSfDLHE)
+
+*A walkthrough of a RED emergency case, a YELLOW case and a non-English case.*
 ![Aarogya Clinical Triage Interface](./screenshots/1.png)
 *The Aarogya triage interface featuring multilingual intake across 8 Indian languages, state selection, quick-example scenarios, and symptom description input.*
 
