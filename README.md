@@ -232,9 +232,16 @@ pip install -r requirements.txt
 ### 4. Configure API Key
 Get an API key from Google AI Studio: [https://aistudio.google.com/](https://aistudio.google.com/).
 
-Create a `.env` file in the project root:
-```bash
-echo GEMINI_API_KEY=your_gemini_api_key_here > .env
+Create a file named `.env` in the project root containing one line, with your real key in place of the placeholder:
+
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+Save it as UTF-8 in a text editor. On Windows PowerShell, don't use `echo ... > .env`, because it saves in the wrong encoding and the app fails on startup. Use this instead:
+
+```powershell
+Set-Content -Path .env -Value "GEMINI_API_KEY=your_gemini_api_key_here" -Encoding ascii
 ```
 
 > [!CAUTION]
