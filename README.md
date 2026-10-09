@@ -17,7 +17,7 @@ Built as an applied portfolio piece demonstrating **production-grade Generative 
 
 [▶ Watch the demo on YouTube](https://youtu.be/U7POrSfDLHE)
 
-*A walkthrough of a RED emergency case, a YELLOW case and a GREEN case.*
+*A walkthrough of a RED emergency case, a YELLOW case and a non-English case.*
 
 ---
 
