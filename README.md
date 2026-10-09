@@ -7,7 +7,7 @@
 [![Evaluation](https://img.shields.io/badge/RED%20Recall-100%25%20(20%2F20)-brightgreen.svg)]()
 [![Script Integrity](https://img.shields.io/badge/Script%20Integrity-100%25%20(43%2F43)-brightgreen.svg)]()
 
-An AI-driven public health triage system designed for multilingual healthcare access in India. **Aarogya** evaluates user-reported symptoms in **8 Indian languages**, assesses clinical urgency into standard triage tiers (**RED** / **YELLOW** / **GREEN**), provides actionable home-care guidance and doctor discussion points, and immediately connects emergency patients to **human-verified national and state helplines**.
+An AI-driven public health triage system designed for multilingual healthcare access in India. **Aarogya** evaluates user-reported symptoms in **8 Indian languages**, assesses clinical urgency into standard triage tiers (**RED** / **YELLOW** / **GREEN**), provides actionable home-care guidance and doctor discussion points, and immediately connects emergency patients to **human-verified national helplines** (plus state-specific entries where available).
 
 Built as an applied portfolio piece demonstrating **production-grade Generative AI engineering, asymmetric risk evaluation, defensive API design, and telemetry logging** for Data Scientist, ML Engineer, and GenAI Engineer roles.
 
@@ -15,22 +15,22 @@ Built as an applied portfolio piece demonstrating **production-grade Generative 
 
 [![Watch the Aarogya demo video](./screenshots/1.png)](https://youtu.be/U7POrSfDLHE)
 
+[▶ Watch the demo on YouTube](https://youtu.be/U7POrSfDLHE)
+
 *A walkthrough of a RED emergency case, a YELLOW case and a non-English case.*
-![Aarogya Clinical Triage Interface](./screenshots/1.png)
-*The Aarogya triage interface featuring multilingual intake across 8 Indian languages, state selection, quick-example scenarios, and symptom description input.*
 
 ---
 
 ## 📌 Project Overview
 
 Accessing emergency medical triage in India presents two distinct bottlenecks:
-1. **The Linguistic Divide**: Over 85% of citizens communicate in regional Indic languages, but digital health tools disproportionately operate in English or rely on clunky, error-prone translation cascades.
+1. **The Linguistic Divide**: Many people are more comfortable in a regional language than in English, but digital health tools mostly assume English or rely on error-prone translation cascades.
 2. **The LLM Reliability Dilemma**: Foundation models can invent plausible-sounding phone numbers, hallucinate medical facts, or drift in formatting, turning a health assistant into a liability.
 
 Aarogya addresses both challenges by treating LLM outputs not as infallible answers, but as probabilistic components constrained by strict schemas, defensive Unicode validation, and human-verified deterministic emergency directories.
 
 ### Supported Languages
-| Language | Script | Supported Dialects & Native Rendering |
+| Language | Script | Primary regions |
 | :--- | :--- | :--- |
 | **English** | Latin | Global / Indian English |
 | **हिंदी (Hindi)** | Devanagari | Standard Hindi |
@@ -45,7 +45,7 @@ Aarogya addresses both challenges by treating LLM outputs not as infallible answ
 
 ## 🏗️ System Architecture
 
-Aarogya replaces the high-latency 3-step translation cascade (`Translate-In -> Assess -> Translate-Out`) with **direct in-language reasoning in a single round trip**, cutting free-tier latency from ~6.5s to **~1.5s**.
+Aarogya replaces the high-latency 3-step translation cascade (`Translate-In -> Assess -> Translate-Out`) with **direct in-language reasoning in a single round trip**, cutting free-tier latency from ~12-18s to ~1.5s for non-English requests (measured on the free tier with the old three-call chain).
 
 ```
                            User Input
@@ -80,7 +80,7 @@ Aarogya replaces the high-latency 3-step translation cascade (`Translate-In -> A
                 ▼                             ▼
    Verified Emergency Directory     Telemetry & Logging
    • NEVER LLM-generated           • SQLite (consultations.db)
-   • Tel URI links (112, 108)      • Anonymized (No PII)
+   • Tel URI links (112, 108)      • No names or contact details collected
    • Bilingual header/labels       • Real-time Streamlit
    • State-specific caveat logic     Analytics Dashboard
 ```
@@ -96,7 +96,7 @@ In clinical triage, engineering choices cannot be treated as aesthetic preferenc
 
 ### 1. Zero LLM Generation for Emergency Phone Numbers
 * **The Failure Mode**: LLMs confidently hallucinate contact numbers, area codes, and outdated emergency lines. In a cardiac arrest or stroke situation, dialing an invented number can be fatal.
-* **The Engineering Fix**: Emergency numbers are completely isolated from model generation. All contact numbers in [emergency_data.py](emergency_data.py) (112, 108, 101, 1091, 1098, KIRAN) are static, verified against official Government of India sources ([india.gov.in](https://www.india.gov.in)), and rendered directly via native `tel:` HTML links.
+* **The Engineering Fix**: Emergency numbers are completely isolated from model generation. National emergency numbers in [emergency_data.py](emergency_data.py) (112, 108, 101, 1091, 1098, KIRAN) are static and verified against official Government of India sources ([india.gov.in](https://www.india.gov.in)), while state-specific entries currently exist only for Karnataka and Delhi, all rendered directly via native `tel:` HTML links.
 
 ### 2. Dual-Layer Schema Enforcement (Pydantic + Gemini JSON Schema)
 * **The Failure Mode**: Parsing free-text completions with substring searches (e.g. `if "SEVERITY: RED" in response`) breaks silently when prompts or model weights shift. A missed condition can downgrade a critical emergency to mild advice.
@@ -128,7 +128,7 @@ During initial testing with Kannada symptom prompts, the model returned a correc
 $$\text{Kannada Input} \xrightarrow{\text{LLM Generation}} \text{Armenian Unicode Block (U+0530 - U+058F)}$$
 
 ### 2. Root Cause Analysis
-Low-resource Indic tokens can suffer from cross-attention leakage in multilingual foundation models when token frequency is low and thinking instructions do not anchor the target Unicode script.
+Suspected cause: low-resource Indic tokens being confused with another script under a minimal reasoning budget. The exact cause was not isolated; the fix targets the symptom with validation, not the root cause.
 
 ### 3. The Defensive Fix
 Rather than relying on vague prompt tuning, we deployed a three-part defensive architecture:
@@ -198,7 +198,7 @@ Combined RED-Case Recall:  20/20 = 100.0%
 * **Frontend**: Streamlit (Native design system in Deep Trust Teal `#0C4A60`, zero non-standard CSS frameworks)
 * **Data Validation**: Pydantic v2 & OpenAPI-compatible JSON Schemas
 * **Persistence & Telemetry**: SQLite3 (`db.py`) & Pandas
-* **Evaluation & Testing**: Python `unittest` style harness with Chrome DevTools Protocol (CDP) automated UI/scroll verification
+* **Evaluation & Testing**: Custom Python evaluation harness (eval/run_eval.py)
 
 ---
 
@@ -206,8 +206,8 @@ Combined RED-Case Recall:  20/20 = 100.0%
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/symptom-checker.git
-cd symptom-checker
+git clone https://github.com/Soundarya-Rao/Aarogya-symptom-checker.git
+cd Aarogya-symptom-checker
 ```
 
 ### 2. Create and Activate Virtual Environment
@@ -260,15 +260,25 @@ Aarogya includes an integrated **Analytics & Insights** tab backed by SQLite (`c
 * **Emergency Rate (%)**: Percentage of incoming consultations triaged as RED.
 * **Language Distribution**: Breakdown across all 8 supported Indian languages.
 * **State-Level Distribution**: Regional demand patterns across Indian States and UTs.
-* **Anonymized Consultation Ledger**: Auditable table with UTC timestamps, translated English symptom logs, and emergency classification.
+* **Consultation Ledger (No names or contact details collected)**: Auditable table with UTC timestamps, translated English symptom logs, and emergency classification.
 
 ---
 
 ## ⚠️ Known Limitations & Disclaimers
 
 1. **Demonstration & Portfolio Purpose**: This project is built as an engineering proof-of-concept and portfolio piece. It is **not** a certified medical device (SaMD) or clinical diagnostic tool.
-2. **Partial State Helpline Coverage**: While national emergency lines (112, 108) function across all states, state-specific helpline numbers are currently verified for Karnataka and Delhi. All other states fall back to national numbers with a prominent, honest UI caveat.
-3. **Free-Tier Quota Constraints**: Built to operate within Google Gemini API free-tier boundaries (15 requests per minute). The client implements automatic `retry_delay` header parsing and exponential backoff to handle quota resets gracefully.
+2. **Partial State Helpline Coverage**: While national emergency lines (112, 108) function across all states, state-specific helpline numbers are currently included for Karnataka and Delhi (not yet independently verified against official sources). All other states fall back to national numbers with a prominent, honest UI caveat.
+3. **Free-Tier Quota Constraints**: Built to operate within Google Gemini API free-tier boundaries (free-tier limits vary by model and plan). The client implements automatic `retry_delay` header parsing and exponential backoff to handle quota resets gracefully.
+4. **Evaluation Scope**: The evaluation set was written by the developer and is a regression and safety-gate suite, not a clinical validation study.
+
+---
+
+## 🗺️ Roadmap
+
+* **Installable mobile app**: the real use case is a phone in an emergency, and this version is a web prototype.
+* **Clinician-reviewed evaluation set**: Expansion and expert clinical validation of test cases.
+* **More state helplines, each verified against an official source**
+* **Optional voice input**: Regional language speech-to-text intake for hands-free accessibility.
 
 ---
 
